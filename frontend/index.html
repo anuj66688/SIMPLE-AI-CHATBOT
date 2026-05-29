@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Assistant – Your Intelligent Chatbot</title>
+  <meta name="description" content="Experience the future of AI conversation. Chat smarter, faster, and better with our Gemini-powered AI assistant." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="nav-logo">
+        <div class="logo-icon">
+          <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="16" cy="16" r="14" fill="url(#grad1)" />
+            <path d="M10 16C10 12.686 12.686 10 16 10C19.314 10 22 12.686 22 16" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+            <circle cx="16" cy="19" r="3" fill="white"/>
+            <defs>
+              <linearGradient id="grad1" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#6366f1"/>
+                <stop offset="1" stop-color="#8b5cf6"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <span>AI Assistant</span>
+      </a>
+      <div class="nav-links">
+        <a href="#features" class="nav-link">Features</a>
+        <a href="#how-it-works" class="nav-link">How It Works</a>
+        <a href="login.html" class="nav-link">Login</a>
+        <a href="register.html" class="btn-primary nav-cta" id="getStartedNav">Get Started Free</a>
+      </div>
+      <button class="nav-mobile-toggle" id="mobileToggle" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <div class="nav-mobile-menu" id="mobileMenu">
+      <a href="#features">Features</a>
+      <a href="#how-it-works">How It Works</a>
+      <a href="login.html">Login</a>
+      <a href="register.html">Get Started Free</a>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero" id="hero">
+    <div class="hero-bg">
+      <div class="hero-orb orb-1"></div>
+      <div class="hero-orb orb-2"></div>
+      <div class="hero-orb orb-3"></div>
+      <div class="hero-grid"></div>
+    </div>
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span class="badge-dot"></span>
+        <span>Powered by Google Gemini AI</span>
+      </div>
+      <h1 class="hero-title">
+        Chat with the Most<br />
+        <span class="gradient-text">Intelligent AI</span><br />
+        Assistant Ever Built
+      </h1>
+      <p class="hero-subtitle">
+        Experience next-generation AI conversations. Ask anything, get instant answers,
+        remember context, and unlock your full potential with our powerful AI chatbot.
+      </p>
+      <div class="hero-actions">
+        <a href="register.html" class="btn-primary btn-lg" id="heroCta">
+          <span>Start Chatting Free</span>
+          <svg viewBox="0 0 20 20" fill="currentColor" width="20" height="20">
+            <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+          </svg>
+        </a>
+        <a href="login.html" class="btn-secondary btn-lg">
+          Sign In
+        </a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat-item">
+          <span class="stat-number">10K+</span>
+          <span class="stat-label">Active Users</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <span class="stat-number">1M+</span>
+          <span class="stat-label">Messages Sent</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <span class="stat-number">99.9%</span>
+          <span class="stat-label">Uptime</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chat Preview -->
+    <div class="hero-preview">
+      <div class="preview-window">
+        <div class="preview-header">
+          <div class="preview-dots">
+            <span></span><span></span><span></span>
+          </div>
+          <span class="preview-title">AI Assistant</span>
+          <div class="preview-status">
+            <span class="status-dot"></span>
+            <span>Online</span>
+          </div>
+        </div>
+        <div class="preview-messages">
+          <div class="preview-msg bot">
+            <div class="preview-avatar">AI</div>
+            <div class="preview-bubble">Hello! I'm your AI assistant. How can I help you today? 👋</div>
+          </div>
+          <div class="preview-msg user">
+            <div class="preview-bubble">Can you explain quantum computing in simple terms?</div>
+          </div>
+          <div class="preview-msg bot animate-in">
+            <div class="preview-avatar">AI</div>
+            <div class="preview-bubble">
+              Quantum computing uses quantum bits (qubits) that can exist in multiple states simultaneously — unlike regular bits that are just 0 or 1. This lets quantum computers solve certain complex problems exponentially faster! 🔬⚡
+            </div>
+          </div>
+          <div class="preview-typing">
+            <div class="preview-avatar">AI</div>
+            <div class="typing-dots">
+              <span></span><span></span><span></span>
+            </div>
+          </div>
+        </div>
+        <div class="preview-input">
+          <input type="text" placeholder="Ask me anything..." readonly />
+          <button class="preview-send">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="features" id="features">
+    <div class="section-container">
+      <div class="section-header">
+        <span class="section-tag">Features</span>
+        <h2>Everything You Need in One Place</h2>
+        <p>Packed with powerful features to make your AI experience seamless and productive.</p>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card" data-delay="0">
+          <div class="feature-icon" style="--icon-color: #6366f1;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+          </div>
+          <h3>Smart Conversations</h3>
+          <p>Context-aware AI that remembers your conversation history and provides coherent, intelligent responses.</p>
+        </div>
+        <div class="feature-card" data-delay="100">
+          <div class="feature-icon" style="--icon-color: #8b5cf6;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
+          </div>
+          <h3>Secure & Private</h3>
+          <p>Enterprise-grade security with Firebase Authentication. Your conversations are encrypted and private.</p>
+        </div>
+        <div class="feature-card" data-delay="200">
+          <div class="feature-icon" style="--icon-color: #06b6d4;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+            </svg>
+          </div>
+          <h3>Chat History</h3>
+          <p>All your conversations are saved automatically. Pick up right where you left off, anytime.</p>
+        </div>
+        <div class="feature-card" data-delay="300">
+          <div class="feature-icon" style="--icon-color: #10b981;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="2" y1="12" x2="22" y2="12"></line>
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+            </svg>
+          </div>
+          <h3>Powered by Gemini</h3>
+          <p>Backed by Google's most advanced Gemini AI model for state-of-the-art language understanding.</p>
+        </div>
+        <div class="feature-card" data-delay="400">
+          <div class="feature-icon" style="--icon-color: #f59e0b;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+              <line x1="8" y1="21" x2="16" y2="21"></line>
+              <line x1="12" y1="17" x2="12" y2="21"></line>
+            </svg>
+          </div>
+          <h3>Multi-Device</h3>
+          <p>Fully responsive design works perfectly on desktop, tablet, and mobile devices.</p>
+        </div>
+        <div class="feature-card" data-delay="500">
+          <div class="feature-icon" style="--icon-color: #ef4444;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+            </svg>
+          </div>
+          <h3>Lightning Fast</h3>
+          <p>Optimized backend with rate limiting and caching delivers responses in milliseconds.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works -->
+  <section class="how-it-works" id="how-it-works">
+    <div class="section-container">
+      <div class="section-header">
+        <span class="section-tag">Simple Process</span>
+        <h2>Get Started in Seconds</h2>
+        <p>Three simple steps to unlock the power of AI conversations.</p>
+      </div>
+      <div class="steps-container">
+        <div class="step-item">
+          <div class="step-number">01</div>
+          <div class="step-content">
+            <h3>Create Your Account</h3>
+            <p>Sign up with Google or email in seconds. No credit card required — completely free to start.</p>
+          </div>
+          <div class="step-connector"></div>
+        </div>
+        <div class="step-item">
+          <div class="step-number">02</div>
+          <div class="step-content">
+            <h3>Start a Conversation</h3>
+            <p>Click "New Chat" and type your question. Our AI understands natural language perfectly.</p>
+          </div>
+          <div class="step-connector"></div>
+        </div>
+        <div class="step-item">
+          <div class="step-number">03</div>
+          <div class="step-content">
+            <h3>Get Instant Answers</h3>
+            <p>Receive intelligent, contextual responses instantly. Your conversations are automatically saved.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="cta-section">
+    <div class="cta-bg">
+      <div class="cta-orb"></div>
+    </div>
+    <div class="section-container">
+      <div class="cta-content">
+        <h2>Ready to Experience the Future?</h2>
+        <p>Join thousands of users already having smarter conversations with AI.</p>
+        <a href="register.html" class="btn-primary btn-lg">
+          <span>Start for Free Today</span>
+          <svg viewBox="0 0 20 20" fill="currentColor" width="20" height="20">
+            <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+          </svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <a href="index.html" class="nav-logo">
+          <div class="logo-icon">
+            <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="16" cy="16" r="14" fill="url(#grad2)"/>
+              <path d="M10 16C10 12.686 12.686 10 16 10C19.314 10 22 12.686 22 16" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+              <circle cx="16" cy="19" r="3" fill="white"/>
+              <defs>
+                <linearGradient id="grad2" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#6366f1"/><stop offset="1" stop-color="#8b5cf6"/>
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+          <span>AI Assistant</span>
+        </a>
+        <p>The most intelligent AI chatbot powered by Google Gemini.</p>
+      </div>
+      <div class="footer-links">
+        <div class="footer-col">
+          <h4>Product</h4>
+          <a href="#features">Features</a>
+          <a href="#how-it-works">How It Works</a>
+          <a href="chat.html">Chat Now</a>
+        </div>
+        <div class="footer-col">
+          <h4>Account</h4>
+          <a href="login.html">Login</a>
+          <a href="register.html">Register</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2024 AI Assistant. Built with ❤️ using Google Gemini.</p>
+    </div>
+  </footer>
+
+  <script src="js/firebase.js"></script>
+  <script>
+    // Redirect if already logged in
+    document.addEventListener('DOMContentLoaded', () => {
+      firebase.auth().onAuthStateChanged((user) => {
+        if (user) {
+          document.getElementById('getStartedNav')?.setAttribute('href', 'chat.html');
+          document.getElementById('heroCta')?.setAttribute('href', 'chat.html');
+        }
+      });
+
+      // Mobile menu toggle
+      const toggle = document.getElementById('mobileToggle');
+      const menu = document.getElementById('mobileMenu');
+      toggle?.addEventListener('click', () => {
+        menu.classList.toggle('active');
+        toggle.classList.toggle('active');
+      });
+
+      // Navbar scroll effect
+      window.addEventListener('scroll', () => {
+        const navbar = document.getElementById('navbar');
+        navbar.classList.toggle('scrolled', window.scrollY > 20);
+      });
+
+      // Animate feature cards on scroll
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const delay = entry.target.dataset.delay || 0;
+            setTimeout(() => entry.target.classList.add('visible'), parseInt(delay));
+          }
+        });
+      }, { threshold: 0.1 });
+
+      document.querySelectorAll('.feature-card, .step-item').forEach(el => observer.observe(el));
+    });
+  </script>
+</body>
+</html>

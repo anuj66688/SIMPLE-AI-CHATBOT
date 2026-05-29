@@ -1,0 +1,72 @@
+# ============================================================
+# AI Assistant Chatbot — Firestore Security Rules
+# Paste this in: Firebase Console > Firestore > Rules
+# ============================================================
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Helper Functions ──
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return request.auth.uid == uid;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // ── Users Collection ──
+    match /users/{userId} {
+      // Anyone authenticated can create their own profile
+      allow create: if isAuthenticated() && isOwner(userId);
+
+      // Users can read/update their own profile; admins can read all
+      allow read: if isOwner(userId) || isAdmin();
+      allow update: if isOwner(userId) || isAdmin();
+
+      // Only admins can delete users
+      allow delete: if isAdmin();
+    }
+
+    // ── Chats Collection ──
+    match /chats/{chatId} {
+      // Authenticated users can create chats
+      allow create: if isAuthenticated();
+
+      // Users can only read/update/delete their own chats
+      allow read, update, delete: if isAuthenticated() &&
+        (resource.data.uid == request.auth.uid || isAdmin());
+    }
+
+    // ── Messages Collection ──
+    match /messages/{messageId} {
+      // Authenticated users can create messages
+      allow create: if isAuthenticated();
+
+      // Users can read/delete their own messages
+      allow read: if isAuthenticated() &&
+        (resource.data.uid == request.auth.uid || isAdmin());
+
+      allow delete: if isAuthenticated() &&
+        (resource.data.uid == request.auth.uid || isAdmin());
+    }
+
+    // ── Logs Collection ──
+    match /logs/{logId} {
+      // Backend creates logs (service account)
+      allow create: if isAuthenticated();
+
+      // Only admins can read logs
+      allow read: if isAdmin();
+
+      // No deletes
+      allow delete: if isAdmin();
+    }
+  }
+}

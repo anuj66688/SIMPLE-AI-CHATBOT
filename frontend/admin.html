@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard – AI Assistant</title>
+  <meta name="description" content="Admin dashboard for AI Assistant. Manage users, chats, logs, and analytics." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/admin.css" />
+</head>
+<body class="admin-body">
+
+  <!-- Sidebar -->
+  <aside class="admin-sidebar" id="adminSidebar">
+    <div class="admin-sidebar-header">
+      <a href="index.html" class="sidebar-logo">
+        <div class="logo-icon">
+          <svg viewBox="0 0 32 32" fill="none">
+            <circle cx="16" cy="16" r="14" fill="url(#adminGrad)"/>
+            <path d="M10 16C10 12.686 12.686 10 16 10C19.314 10 22 12.686 22 16" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+            <circle cx="16" cy="19" r="3" fill="white"/>
+            <defs>
+              <linearGradient id="adminGrad" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#6366f1"/><stop offset="1" stop-color="#8b5cf6"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <span>Admin Panel</span>
+      </a>
+    </div>
+
+    <nav class="admin-nav">
+      <a href="#dashboard" class="admin-nav-item active" data-section="dashboard" id="navDashboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+          <rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect>
+          <rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect>
+        </svg>
+        <span>Dashboard</span>
+      </a>
+      <a href="#users" class="admin-nav-item" data-section="users" id="navUsers">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+          <circle cx="9" cy="7" r="4"></circle>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+        </svg>
+        <span>Users</span>
+        <span class="admin-badge" id="usersBadge">0</span>
+      </a>
+      <a href="#chats" class="admin-nav-item" data-section="chats" id="navChats">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        </svg>
+        <span>Chats</span>
+        <span class="admin-badge" id="chatsBadge">0</span>
+      </a>
+      <a href="#logs" class="admin-nav-item" data-section="logs" id="navLogs">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line>
+          <polyline points="10 9 9 9 8 9"></polyline>
+        </svg>
+        <span>Logs</span>
+      </a>
+      <a href="#analytics" class="admin-nav-item" data-section="analytics" id="navAnalytics">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+          <line x1="18" y1="20" x2="18" y2="10"></line>
+          <line x1="12" y1="20" x2="12" y2="4"></line>
+          <line x1="6" y1="20" x2="6" y2="14"></line>
+        </svg>
+        <span>Analytics</span>
+      </a>
+    </nav>
+
+    <div class="admin-sidebar-footer">
+      <a href="chat.html" class="admin-nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        </svg>
+        <span>Back to Chat</span>
+      </a>
+      <button class="admin-nav-item danger" id="adminLogoutBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+          <polyline points="16 17 21 12 16 7"></polyline>
+          <line x1="21" y1="12" x2="9" y2="12"></line>
+        </svg>
+        <span>Logout</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="admin-main" id="adminMain">
+    <!-- Top Bar -->
+    <header class="admin-topbar">
+      <div class="admin-topbar-left">
+        <button class="mobile-menu-btn" id="adminMobileToggle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22">
+            <line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+        <h1 class="admin-page-title" id="adminPageTitle">Dashboard</h1>
+      </div>
+      <div class="admin-topbar-right">
+        <div class="admin-user-info">
+          <div class="admin-user-avatar" id="adminAvatar">A</div>
+          <span id="adminUserName">Admin</span>
+        </div>
+        <button class="admin-refresh-btn" id="refreshBtn" title="Refresh data">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+            <polyline points="23 4 23 10 17 10"></polyline>
+            <polyline points="1 20 1 14 7 14"></polyline>
+            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- ===== DASHBOARD SECTION ===== -->
+    <section class="admin-section active" id="sectionDashboard">
+      <!-- Stats Cards -->
+      <div class="stats-grid">
+        <div class="stat-card" id="statTotalUsers">
+          <div class="stat-card-icon" style="--c: #6366f1;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+          </div>
+          <div class="stat-card-info">
+            <span class="stat-card-label">Total Users</span>
+            <span class="stat-card-value" id="totalUsersVal">—</span>
+          </div>
+          <div class="stat-card-trend up" id="usersTrend">↑ Active</div>
+        </div>
+
+        <div class="stat-card" id="statTotalChats">
+          <div class="stat-card-icon" style="--c: #8b5cf6;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+          </div>
+          <div class="stat-card-info">
+            <span class="stat-card-label">Total Chats</span>
+            <span class="stat-card-value" id="totalChatsVal">—</span>
+          </div>
+          <div class="stat-card-trend up">↑ Growing</div>
+        </div>
+
+        <div class="stat-card" id="statTotalMessages">
+          <div class="stat-card-icon" style="--c: #06b6d4;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+            </svg>
+          </div>
+          <div class="stat-card-info">
+            <span class="stat-card-label">Total Messages</span>
+            <span class="stat-card-value" id="totalMessagesVal">—</span>
+          </div>
+          <div class="stat-card-trend up">↑ All time</div>
+        </div>
+
+        <div class="stat-card" id="statActiveUsers">
+          <div class="stat-card-icon" style="--c: #10b981;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+          </div>
+          <div class="stat-card-info">
+            <span class="stat-card-label">Active Users (7d)</span>
+            <span class="stat-card-value" id="activeUsersVal">—</span>
+          </div>
+          <div class="stat-card-trend up">↑ This week</div>
+        </div>
+
+        <div class="stat-card" id="statMsgsToday">
+          <div class="stat-card-icon" style="--c: #f59e0b;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+          </div>
+          <div class="stat-card-info">
+            <span class="stat-card-label">Messages Today</span>
+            <span class="stat-card-value" id="msgsTodayVal">—</span>
+          </div>
+          <div class="stat-card-trend" id="todayTrend">Today</div>
+        </div>
+
+        <div class="stat-card" id="statTokens">
+          <div class="stat-card-icon" style="--c: #ef4444;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+            </svg>
+          </div>
+          <div class="stat-card-info">
+            <span class="stat-card-label">Tokens This Month</span>
+            <span class="stat-card-value" id="totalTokensVal">—</span>
+          </div>
+          <div class="stat-card-trend">30 days</div>
+        </div>
+      </div>
+
+      <!-- Quick Charts -->
+      <div class="admin-charts-row">
+        <div class="admin-chart-card">
+          <div class="chart-header">
+            <h3>Messages (Last 7 Days)</h3>
+          </div>
+          <canvas id="weeklyChart" height="200"></canvas>
+        </div>
+        <div class="admin-chart-card">
+          <div class="chart-header">
+            <h3>User Registrations (Last 7 Days)</h3>
+          </div>
+          <canvas id="registrationsChart" height="200"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== USERS SECTION ===== -->
+    <section class="admin-section" id="sectionUsers">
+      <div class="section-toolbar">
+        <h2>All Users</h2>
+        <div class="toolbar-actions">
+          <input type="text" class="search-input" id="userSearch" placeholder="Search users..." />
+        </div>
+      </div>
+      <div class="admin-table-wrapper">
+        <table class="admin-table" id="usersTable">
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Joined</th>
+              <th>Last Login</th>
+              <th>Chats</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="usersTableBody">
+            <tr><td colspan="7" class="table-loading">Loading users...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===== CHATS SECTION ===== -->
+    <section class="admin-section" id="sectionChats">
+      <div class="section-toolbar">
+        <h2>All Chats</h2>
+        <div class="toolbar-actions">
+          <input type="text" class="search-input" id="chatSearch" placeholder="Search chats..." />
+        </div>
+      </div>
+      <div class="admin-table-wrapper">
+        <table class="admin-table" id="chatsTable">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>User ID</th>
+              <th>Messages</th>
+              <th>Created</th>
+              <th>Last Updated</th>
+            </tr>
+          </thead>
+          <tbody id="chatsTableBody">
+            <tr><td colspan="5" class="table-loading">Loading chats...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===== LOGS SECTION ===== -->
+    <section class="admin-section" id="sectionLogs">
+      <div class="section-toolbar">
+        <h2>Interaction Logs</h2>
+        <div class="toolbar-actions">
+          <input type="text" class="search-input" id="logSearch" placeholder="Search logs..." />
+        </div>
+      </div>
+      <div class="admin-table-wrapper">
+        <table class="admin-table" id="logsTable">
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>User</th>
+              <th>Question</th>
+              <th>Tokens</th>
+              <th>Session</th>
+            </tr>
+          </thead>
+          <tbody id="logsTableBody">
+            <tr><td colspan="5" class="table-loading">Loading logs...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===== ANALYTICS SECTION ===== -->
+    <section class="admin-section" id="sectionAnalytics">
+      <div class="section-toolbar">
+        <h2>Analytics</h2>
+        <div class="toolbar-actions">
+          <select class="admin-select" id="analyticsRange">
+            <option value="7">Last 7 days</option>
+            <option value="30" selected>Last 30 days</option>
+            <option value="90">Last 90 days</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="analytics-grid">
+        <div class="admin-chart-card full-width">
+          <div class="chart-header">
+            <h3>Daily Message Volume</h3>
+            <div class="chart-legend">
+              <span class="legend-dot" style="background:#6366f1;"></span> Messages
+            </div>
+          </div>
+          <canvas id="dailyMessagesChart" height="120"></canvas>
+        </div>
+
+        <div class="admin-chart-card full-width">
+          <div class="chart-header">
+            <h3>Token Usage Trend</h3>
+            <div class="chart-legend">
+              <span class="legend-dot" style="background:#10b981;"></span> Tokens
+            </div>
+          </div>
+          <canvas id="tokenUsageChart" height="120"></canvas>
+        </div>
+
+        <div class="admin-chart-card">
+          <div class="chart-header">
+            <h3>New User Registrations</h3>
+          </div>
+          <canvas id="userGrowthChart" height="200"></canvas>
+        </div>
+
+        <div class="admin-chart-card">
+          <div class="chart-header">
+            <h3>Message Distribution</h3>
+          </div>
+          <canvas id="messageDistChart" height="200"></canvas>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Toast -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="js/firebase.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/dashboard.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      firebase.auth().onAuthStateChanged((user) => {
+        if (!user) {
+          window.location.href = 'login.html';
+          return;
+        }
+        AdminDashboard.init(user);
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,138 @@
+/* login.css — Login Page Styles */
+/* Extends style.css auth base styles */
+
+.auth-card {
+  animation: card-enter 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes card-enter {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Input focus glow effect */
+.form-input:focus {
+  background: rgba(99, 102, 241, 0.04);
+}
+
+/* Login button pulse on hover */
+#loginBtn {
+  position: relative;
+  overflow: hidden;
+}
+
+#loginBtn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+#loginBtn:not(:disabled):hover::after {
+  opacity: 1;
+}
+
+/* Animated underline for forgot password */
+.forgot-link {
+  position: relative;
+}
+.forgot-link::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: var(--accent-primary);
+  transition: width 0.25s ease;
+}
+.forgot-link:hover::after {
+  width: 100%;
+}
+
+/* Auth switch link */
+.auth-switch a {
+  position: relative;
+}
+.auth-switch a::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: var(--accent-primary);
+  transition: width 0.25s ease;
+}
+.auth-switch a:hover::after {
+  width: 100%;
+}
+
+/* Input icon animation on focus */
+.input-wrapper:focus-within .input-icon {
+  color: var(--accent-primary);
+  transition: color 0.2s;
+}
+
+/* Google button shimmer */
+.btn-google:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+}
+
+/* Error shake animation */
+.form-input.error {
+  animation: shake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@keyframes shake {
+  10%, 90% { transform: translateX(-2px); }
+  20%, 80% { transform: translateX(4px); }
+  30%, 50%, 70% { transform: translateX(-4px); }
+  40%, 60% { transform: translateX(4px); }
+}
+
+/* Field error fade in */
+.field-error:not(:empty) {
+  animation: fade-in 0.2s ease;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Success alert */
+.auth-alert.success {
+  animation: slide-down 0.3s ease;
+}
+
+.auth-alert.error {
+  animation: slide-down 0.3s ease;
+}
+
+@keyframes slide-down {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive tweaks */
+@media (max-width: 480px) {
+  .auth-logo {
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+  }
+  .label-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+}
