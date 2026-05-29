@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AI Assistant – Your Intelligent Chatbot</title>
-  <meta name="description" content="Experience the future of AI conversation. Chat smarter, faster, and better with our Gemini-powered AI assistant." />
+  <meta name="description" content="Experience the future of AI conversation. Chat smarter, faster, and better with our OpenAI-powered AI assistant." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
@@ -308,21 +308,23 @@
       </div>
     </div>
     <div class="footer-bottom">
-      <p>&copy; 2024 AI Assistant. Built with ❤️ using Google Gemini.</p>
+      <p>&copy; 2024 AI Assistant. Built with ❤️ using OpenAI.</p>
     </div>
   </footer>
 
   <script src="js/firebase.js"></script>
   <script>
-    // Redirect if already logged in
-    document.addEventListener('DOMContentLoaded', () => {
+    // Wait for Firebase SDKs to load before using firebase.auth()
+    document.addEventListener('firebase-ready', () => {
       firebase.auth().onAuthStateChanged((user) => {
         if (user) {
           document.getElementById('getStartedNav')?.setAttribute('href', 'chat.html');
           document.getElementById('heroCta')?.setAttribute('href', 'chat.html');
         }
       });
+    });
 
+    document.addEventListener('DOMContentLoaded', () => {
       // Mobile menu toggle
       const toggle = document.getElementById('mobileToggle');
       const menu = document.getElementById('mobileMenu');

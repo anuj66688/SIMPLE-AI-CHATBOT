@@ -251,8 +251,8 @@
   <script src="js/api.js"></script>
   <script src="js/chat.js"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      // Auth guard
+    // Wait for Firebase SDKs to load
+    document.addEventListener('firebase-ready', () => {
       firebase.auth().onAuthStateChanged((user) => {
         if (!user) {
           window.location.href = 'login.html';

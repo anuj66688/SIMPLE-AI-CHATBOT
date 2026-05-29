@@ -186,12 +186,11 @@
   <script src="js/firebase.js"></script>
   <script src="js/auth.js"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      // Redirect if already logged in
+    // Wait for Firebase SDKs to load
+    document.addEventListener('firebase-ready', () => {
       firebase.auth().onAuthStateChanged((user) => {
         if (user) window.location.href = 'chat.html';
       });
-
       AuthManager.initRegister();
     });
   </script>
