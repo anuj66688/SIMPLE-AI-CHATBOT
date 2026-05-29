@@ -40,11 +40,16 @@ const authenticate = async (req, res, next) => {
         authType: 'firebase',
       };
 
-      // Check if user has admin role in Firestore
-      const db = getDb();
-      const userDoc = await db.collection('users').doc(decodedToken.uid).get();
-      if (userDoc.exists && userDoc.data().role === 'admin') {
-        decodedUser.role = 'admin';
+      // Check if user has admin role in Firestore (non-blocking)
+      try {
+        const db = getDb();
+        const userDoc = await db.collection('users').doc(decodedToken.uid).get();
+        if (userDoc.exists && userDoc.data().role === 'admin') {
+          decodedUser.role = 'admin';
+        }
+      } catch (firestoreErr) {
+        logger.warn(`Firestore role check failed (non-fatal): ${firestoreErr.message}`);
+        // Auth still succeeds — just can't determine admin role
       }
     } catch (firebaseError) {
       logger.warn(`Firebase auth failed: ${firebaseError.message}`);
