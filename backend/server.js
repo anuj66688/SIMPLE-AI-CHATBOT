@@ -7,7 +7,7 @@ const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
 
 const { initializeFirebase } = require('./config/firebase');
-const { initializeOpenAI } = require('./services/geminiService');
+const { initializeGemini } = require('./services/geminiService');
 const logger = require('./utils/logger');
 const { generalLimiter } = require('./middleware/rateLimiter');
 const { errorHandler, notFoundHandler } = require('./middleware/errorMiddleware');
@@ -31,9 +31,9 @@ try {
 }
 
 try {
-  initializeOpenAI();
+  initializeGemini();
 } catch (error) {
-  logger.error('Failed to initialize OpenAI:', error);
+  logger.error('Failed to initialize Gemini:', error);
   process.exit(1);
 }
 

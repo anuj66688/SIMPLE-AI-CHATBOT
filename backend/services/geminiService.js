@@ -1,95 +1,96 @@
-const OpenAI = require('openai');
+const { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } = require('@google/generative-ai');
 const logger = require('../utils/logger');
 
-let openai;
+let genAI;
+let model;
 
-const initializeOpenAI = () => {
-  if (!process.env.OPENAI_API_KEY) {
-    throw new Error('OPENAI_API_KEY is not configured');
+const initializeGemini = () => {
+  if (!process.env.GEMINI_API_KEY) {
+    throw new Error('GEMINI_API_KEY is not configured');
   }
 
-  openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
+  genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+  model = genAI.getGenerativeModel({
+    model: 'gemini-1.5-flash',
+    safetySettings: [
+      { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
+      { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
+      { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
+      { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
+    ],
+    generationConfig: {
+      temperature: 0.7,
+      topP: 0.95,
+      topK: 40,
+      maxOutputTokens: 4096,
+    },
   });
 
-  logger.info('✅ OpenAI initialized successfully');
-  return openai;
+  logger.info('✅ Gemini AI initialized successfully');
+  return model;
 };
 
 /**
- * Generate a response from OpenAI with conversation history
+ * Generate a response from Gemini with conversation history
  * @param {string} userMessage - The user's current message
  * @param {Array} history - Array of previous messages [{sender, content}]
  * @returns {Object} - { response: string, tokensUsed: number }
  */
 const generateResponse = async (userMessage, history = []) => {
-  if (!openai) {
-    initializeOpenAI();
+  if (!model) {
+    initializeGemini();
   }
 
   try {
-    // Build the system message
-    const systemMessage = {
-      role: 'system',
-      content: `You are a helpful, knowledgeable, and friendly AI assistant. 
+    // Build chat history for Gemini
+    const chatHistory = history.map((msg) => ({
+      role: msg.sender === 'user' ? 'user' : 'model',
+      parts: [{ text: msg.content }],
+    }));
+
+    const chat = model.startChat({
+      history: chatHistory,
+      systemInstruction: {
+        parts: [{
+          text: `You are a helpful, knowledgeable, and friendly AI assistant. 
 You provide accurate, thoughtful, and well-structured responses. 
 You can help with a wide range of topics including coding, writing, analysis, math, creative tasks, and general knowledge.
 Keep your responses clear, concise, and helpful. Use markdown formatting when appropriate.
-Always be respectful, professional, and honest. If you don't know something, say so.`,
-    };
-
-    // Format history for OpenAI chat
-    const messages = [systemMessage];
-
-    history.forEach((msg) => {
-      messages.push({
-        role: msg.sender === 'user' ? 'user' : 'assistant',
-        content: msg.content,
-      });
+Always be respectful, professional, and honest. If you don't know something, say so.`
+        }]
+      },
     });
 
-    // Add the current user message
-    messages.push({ role: 'user', content: userMessage });
+    logger.debug(`Sending message to Gemini: "${userMessage.substring(0, 100)}..."`);
 
-    logger.debug(`Sending message to OpenAI: "${userMessage.substring(0, 100)}..."`);
-
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo',
-      messages,
-      temperature: 0.7,
-      max_tokens: 4096,
-      top_p: 0.95,
-      frequency_penalty: 0,
-      presence_penalty: 0,
-    });
-
-    const text = completion.choices[0]?.message?.content || 'No response generated.';
+    const result = await chat.sendMessage(userMessage);
+    const response = result.response;
+    const text = response.text() || 'No response generated.';
 
     // Extract token usage
-    const tokensUsed = completion.usage
-      ? (completion.usage.prompt_tokens || 0) + (completion.usage.completion_tokens || 0)
-      : 0;
+    const usage = response.usageMetadata || {};
+    const tokensUsed = (usage.promptTokenCount || 0) + (usage.candidatesTokenCount || 0);
 
-    logger.debug(`OpenAI response received. Tokens used: ${tokensUsed}`);
+    logger.debug(`Gemini response received. Tokens used: ${tokensUsed}`);
 
     return {
       response: text,
       tokensUsed,
     };
   } catch (error) {
-    logger.error('OpenAI API error:', error);
+    logger.error('Gemini API error:', error);
 
-    if (error.status === 401 || error.code === 'invalid_api_key') {
-      throw new Error('Invalid OpenAI API key. Please check your configuration.');
+    if (error.message?.includes('API_KEY_INVALID') || error.message?.includes('API key not valid')) {
+      throw new Error('Invalid Gemini API key. Please check your configuration.');
     }
-    if (error.status === 429) {
+    if (error.message?.includes('RATE_LIMIT_EXCEEDED') || error.status === 429) {
       throw new Error('API rate limit exceeded. Please try again later.');
     }
-    if (error.status === 503) {
-      throw new Error('OpenAI service is temporarily unavailable. Please try again.');
+    if (error.message?.includes('SAFETY')) {
+      throw new Error('Response blocked by safety filters. Please rephrase your question.');
     }
-    if (error.code === 'insufficient_quota') {
-      throw new Error('OpenAI quota exceeded. Please check your billing.');
+    if (error.message?.includes('quota')) {
+      throw new Error('API quota exceeded. Please try again later.');
     }
 
     throw new Error(`AI service error: ${error.message}`);
@@ -102,36 +103,22 @@ Always be respectful, professional, and honest. If you don't know something, say
  * @returns {string} - Generated title
  */
 const generateChatTitle = async (firstMessage) => {
-  if (!openai) {
-    initializeOpenAI();
+  if (!model) {
+    initializeGemini();
   }
 
   try {
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo',
-      messages: [
-        {
-          role: 'system',
-          content: 'Generate a short, concise title (max 6 words) for a chat conversation. Return ONLY the title text, no quotes, no explanation, no punctuation at the end.',
-        },
-        {
-          role: 'user',
-          content: `Generate a title for a chat that starts with: "${firstMessage}"`,
-        },
-      ],
-      temperature: 0.7,
-      max_tokens: 30,
-    });
-
-    const title = completion.choices[0]?.message?.content?.trim().replace(/['"]/g, '') || firstMessage.substring(0, 40);
+    const result = await model.generateContent(
+      `Generate a short, concise title (max 6 words) for a chat conversation that starts with: "${firstMessage}". Return ONLY the title text, no quotes, no explanation, no punctuation at the end.`
+    );
+    const title = result.response.text().trim().replace(/['"]/g, '') || firstMessage.substring(0, 40);
     return title.length > 60 ? title.substring(0, 60) + '...' : title;
   } catch (error) {
     logger.error('Error generating chat title:', error);
-    // Fallback: use first 40 chars of the message
     return firstMessage.length > 40
       ? firstMessage.substring(0, 40) + '...'
       : firstMessage;
   }
 };
 
-module.exports = { initializeOpenAI, generateResponse, generateChatTitle };
+module.exports = { initializeGemini, generateResponse, generateChatTitle };
