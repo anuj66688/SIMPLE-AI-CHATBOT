@@ -7,7 +7,7 @@ const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
 
 const { initializeFirebase } = require('./config/firebase');
-const { initializeGemini } = require('./services/geminiService');
+const { initializeGrok } = require('./services/geminiService');
 const logger = require('./utils/logger');
 const { generalLimiter } = require('./middleware/rateLimiter');
 const { errorHandler, notFoundHandler } = require('./middleware/errorMiddleware');
@@ -31,9 +31,9 @@ try {
 }
 
 try {
-  initializeGemini();
+  initializeGrok();
 } catch (error) {
-  logger.error('Failed to initialize Gemini:', error);
+  logger.error('Failed to initialize Grok:', error);
   process.exit(1);
 }
 

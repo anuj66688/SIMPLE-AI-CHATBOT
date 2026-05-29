@@ -1,96 +1,87 @@
-const { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } = require('@google/generative-ai');
+const OpenAI = require('openai');
 const logger = require('../utils/logger');
 
-let genAI;
-let model;
+let client;
 
-const initializeGemini = () => {
-  if (!process.env.GEMINI_API_KEY) {
-    throw new Error('GEMINI_API_KEY is not configured');
+const initializeGrok = () => {
+  if (!process.env.GROK_API_KEY) {
+    throw new Error('GROK_API_KEY is not configured');
   }
 
-  genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-  model = genAI.getGenerativeModel({
-    model: 'gemini-1.5-flash',
-    safetySettings: [
-      { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
-      { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
-      { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
-      { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
-    ],
-    generationConfig: {
-      temperature: 0.7,
-      topP: 0.95,
-      topK: 40,
-      maxOutputTokens: 4096,
-    },
+  client = new OpenAI({
+    apiKey: process.env.GROK_API_KEY,
+    baseURL: 'https://api.x.ai/v1',
   });
 
-  logger.info('✅ Gemini AI initialized successfully');
-  return model;
+  logger.info('✅ Grok AI initialized successfully');
+  return client;
 };
 
 /**
- * Generate a response from Gemini with conversation history
+ * Generate a response from Grok with conversation history
  * @param {string} userMessage - The user's current message
  * @param {Array} history - Array of previous messages [{sender, content}]
  * @returns {Object} - { response: string, tokensUsed: number }
  */
 const generateResponse = async (userMessage, history = []) => {
-  if (!model) {
-    initializeGemini();
+  if (!client) {
+    initializeGrok();
   }
 
   try {
-    // Build chat history for Gemini
-    const chatHistory = history.map((msg) => ({
-      role: msg.sender === 'user' ? 'user' : 'model',
-      parts: [{ text: msg.content }],
-    }));
-
-    const chat = model.startChat({
-      history: chatHistory,
-      systemInstruction: {
-        parts: [{
-          text: `You are a helpful, knowledgeable, and friendly AI assistant. 
+    const systemMessage = {
+      role: 'system',
+      content: `You are a helpful, knowledgeable, and friendly AI assistant. 
 You provide accurate, thoughtful, and well-structured responses. 
 You can help with a wide range of topics including coding, writing, analysis, math, creative tasks, and general knowledge.
 Keep your responses clear, concise, and helpful. Use markdown formatting when appropriate.
-Always be respectful, professional, and honest. If you don't know something, say so.`
-        }]
-      },
+Always be respectful, professional, and honest. If you don't know something, say so.`,
+    };
+
+    // Build messages array
+    const messages = [systemMessage];
+
+    history.forEach((msg) => {
+      messages.push({
+        role: msg.sender === 'user' ? 'user' : 'assistant',
+        content: msg.content,
+      });
     });
 
-    logger.debug(`Sending message to Gemini: "${userMessage.substring(0, 100)}..."`);
+    messages.push({ role: 'user', content: userMessage });
 
-    const result = await chat.sendMessage(userMessage);
-    const response = result.response;
-    const text = response.text() || 'No response generated.';
+    logger.debug(`Sending message to Grok: "${userMessage.substring(0, 100)}..."`);
 
-    // Extract token usage
-    const usage = response.usageMetadata || {};
-    const tokensUsed = (usage.promptTokenCount || 0) + (usage.candidatesTokenCount || 0);
+    const completion = await client.chat.completions.create({
+      model: 'grok-3-mini',
+      messages,
+      temperature: 0.7,
+      max_tokens: 4096,
+    });
 
-    logger.debug(`Gemini response received. Tokens used: ${tokensUsed}`);
+    const text = completion.choices[0]?.message?.content || 'No response generated.';
+
+    const tokensUsed = completion.usage
+      ? (completion.usage.prompt_tokens || 0) + (completion.usage.completion_tokens || 0)
+      : 0;
+
+    logger.debug(`Grok response received. Tokens used: ${tokensUsed}`);
 
     return {
       response: text,
       tokensUsed,
     };
   } catch (error) {
-    logger.error('Gemini API error:', error);
+    logger.error('Grok API error:', error);
 
-    if (error.message?.includes('API_KEY_INVALID') || error.message?.includes('API key not valid')) {
-      throw new Error('Invalid Gemini API key. Please check your configuration.');
+    if (error.status === 401 || error.code === 'invalid_api_key') {
+      throw new Error('Invalid Grok API key. Please check your configuration.');
     }
-    if (error.message?.includes('RATE_LIMIT_EXCEEDED') || error.status === 429) {
+    if (error.status === 429) {
       throw new Error('API rate limit exceeded. Please try again later.');
     }
-    if (error.message?.includes('SAFETY')) {
-      throw new Error('Response blocked by safety filters. Please rephrase your question.');
-    }
-    if (error.message?.includes('quota')) {
-      throw new Error('API quota exceeded. Please try again later.');
+    if (error.status === 503) {
+      throw new Error('Grok service is temporarily unavailable. Please try again.');
     }
 
     throw new Error(`AI service error: ${error.message}`);
@@ -103,15 +94,28 @@ Always be respectful, professional, and honest. If you don't know something, say
  * @returns {string} - Generated title
  */
 const generateChatTitle = async (firstMessage) => {
-  if (!model) {
-    initializeGemini();
+  if (!client) {
+    initializeGrok();
   }
 
   try {
-    const result = await model.generateContent(
-      `Generate a short, concise title (max 6 words) for a chat conversation that starts with: "${firstMessage}". Return ONLY the title text, no quotes, no explanation, no punctuation at the end.`
-    );
-    const title = result.response.text().trim().replace(/['"]/g, '') || firstMessage.substring(0, 40);
+    const completion = await client.chat.completions.create({
+      model: 'grok-3-mini',
+      messages: [
+        {
+          role: 'system',
+          content: 'Generate a short, concise title (max 6 words) for a chat conversation. Return ONLY the title text, no quotes, no explanation, no punctuation at the end.',
+        },
+        {
+          role: 'user',
+          content: `Generate a title for a chat that starts with: "${firstMessage}"`,
+        },
+      ],
+      temperature: 0.7,
+      max_tokens: 30,
+    });
+
+    const title = completion.choices[0]?.message?.content?.trim().replace(/['"]/g, '') || firstMessage.substring(0, 40);
     return title.length > 60 ? title.substring(0, 60) + '...' : title;
   } catch (error) {
     logger.error('Error generating chat title:', error);
@@ -121,4 +125,4 @@ const generateChatTitle = async (firstMessage) => {
   }
 };
 
-module.exports = { initializeGemini, generateResponse, generateChatTitle };
+module.exports = { initializeGrok, generateResponse, generateChatTitle };
