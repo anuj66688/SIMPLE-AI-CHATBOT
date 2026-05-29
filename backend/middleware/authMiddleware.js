@@ -47,9 +47,12 @@ const authenticate = async (req, res, next) => {
         decodedUser.role = 'admin';
       }
     } catch (firebaseError) {
+      logger.warn(`Firebase auth failed: ${firebaseError.message}`);
       // Try JWT verification as fallback
       try {
-        const jwtDecoded = jwt.verify(token, process.env.JWT_SECRET);
+        const jwtDecoded = jwt.verify(token, process.env.JWT_SECRET, {
+          algorithms: ['HS256'],
+        });
         decodedUser = {
           uid: jwtDecoded.uid,
           email: jwtDecoded.email,
@@ -58,7 +61,7 @@ const authenticate = async (req, res, next) => {
           authType: 'jwt',
         };
       } catch (jwtError) {
-        logger.warn(`Auth failed: ${jwtError.message}`);
+        logger.warn(`JWT auth also failed: ${jwtError.message}`);
         return res.status(401).json({
           success: false,
           error: 'Invalid or expired token',

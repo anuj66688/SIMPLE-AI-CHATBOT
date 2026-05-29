@@ -9,9 +9,11 @@ const initializeFirebase = () => {
   }
 
   try {
-    const privateKey = process.env.FIREBASE_PRIVATE_KEY
-      ? process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n')
-      : undefined;
+    let privateKey = process.env.FIREBASE_PRIVATE_KEY;
+    if (privateKey) {
+      // Handle both literal \n strings and already-converted newlines
+      privateKey = privateKey.replace(/\\n/g, '\n');
+    }
 
     const serviceAccount = {
       type: 'service_account',
