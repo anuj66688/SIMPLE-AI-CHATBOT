@@ -4,24 +4,21 @@ const logger = require('../utils/logger');
 let client;
 
 const initializeGrok = () => {
-  if (!process.env.GROK_API_KEY) {
-    throw new Error('GROK_API_KEY is not configured');
+  if (!process.env.GROQ_API_KEY) {
+    throw new Error('GROQ_API_KEY is not configured');
   }
 
   client = new OpenAI({
-    apiKey: process.env.GROK_API_KEY,
-    baseURL: 'https://api.x.ai/v1',
+    apiKey: process.env.GROQ_API_KEY,
+    baseURL: 'https://api.groq.com/openai/v1',
   });
 
-  logger.info('✅ Grok AI initialized successfully');
+  logger.info('✅ Groq AI initialized successfully');
   return client;
 };
 
 /**
- * Generate a response from Grok with conversation history
- * @param {string} userMessage - The user's current message
- * @param {Array} history - Array of previous messages [{sender, content}]
- * @returns {Object} - { response: string, tokensUsed: number }
+ * Generate a response from Groq with conversation history
  */
 const generateResponse = async (userMessage, history = []) => {
   if (!client) {
@@ -29,17 +26,16 @@ const generateResponse = async (userMessage, history = []) => {
   }
 
   try {
-    const systemMessage = {
-      role: 'system',
-      content: `You are a helpful, knowledgeable, and friendly AI assistant. 
+    const messages = [
+      {
+        role: 'system',
+        content: `You are a helpful, knowledgeable, and friendly AI assistant. 
 You provide accurate, thoughtful, and well-structured responses. 
 You can help with a wide range of topics including coding, writing, analysis, math, creative tasks, and general knowledge.
 Keep your responses clear, concise, and helpful. Use markdown formatting when appropriate.
 Always be respectful, professional, and honest. If you don't know something, say so.`,
-    };
-
-    // Build messages array
-    const messages = [systemMessage];
+      },
+    ];
 
     history.forEach((msg) => {
       messages.push({
@@ -50,38 +46,34 @@ Always be respectful, professional, and honest. If you don't know something, say
 
     messages.push({ role: 'user', content: userMessage });
 
-    logger.debug(`Sending message to Grok: "${userMessage.substring(0, 100)}..."`);
+    logger.debug(`Sending message to Groq: "${userMessage.substring(0, 100)}..."`);
 
     const completion = await client.chat.completions.create({
-      model: 'grok-3-mini',
+      model: 'llama-3.3-70b-versatile',
       messages,
       temperature: 0.7,
       max_tokens: 4096,
     });
 
     const text = completion.choices[0]?.message?.content || 'No response generated.';
-
     const tokensUsed = completion.usage
       ? (completion.usage.prompt_tokens || 0) + (completion.usage.completion_tokens || 0)
       : 0;
 
-    logger.debug(`Grok response received. Tokens used: ${tokensUsed}`);
+    logger.debug(`Groq response received. Tokens used: ${tokensUsed}`);
 
-    return {
-      response: text,
-      tokensUsed,
-    };
+    return { response: text, tokensUsed };
   } catch (error) {
-    logger.error('Grok API error:', error);
+    logger.error('Groq API error:', error);
 
-    if (error.status === 401 || error.code === 'invalid_api_key') {
-      throw new Error('Invalid Grok API key. Please check your configuration.');
+    if (error.status === 401) {
+      throw new Error('Invalid Groq API key. Please check your configuration.');
     }
     if (error.status === 429) {
       throw new Error('API rate limit exceeded. Please try again later.');
     }
     if (error.status === 503) {
-      throw new Error('Grok service is temporarily unavailable. Please try again.');
+      throw new Error('Groq service is temporarily unavailable. Please try again.');
     }
 
     throw new Error(`AI service error: ${error.message}`);
@@ -90,8 +82,6 @@ Always be respectful, professional, and honest. If you don't know something, say
 
 /**
  * Generate a chat title based on the first user message
- * @param {string} firstMessage - The first message in the chat
- * @returns {string} - Generated title
  */
 const generateChatTitle = async (firstMessage) => {
   if (!client) {
@@ -100,7 +90,7 @@ const generateChatTitle = async (firstMessage) => {
 
   try {
     const completion = await client.chat.completions.create({
-      model: 'grok-3-mini',
+      model: 'llama-3.3-70b-versatile',
       messages: [
         {
           role: 'system',
