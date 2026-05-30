@@ -92,10 +92,26 @@ const sendMessage = async (req, res, next) => {
             messageCount: 2,
           });
         } else {
-          await db.collection('chats').doc(currentChatId).update({
-            updatedAt: new Date().toISOString(),
-            messageCount: require('firebase-admin').firestore.FieldValue.increment(2),
-          });
+          // Use set with merge to handle cases where the chat doc may not exist yet
+          const chatRef = db.collection('chats').doc(currentChatId);
+          const chatDoc = await chatRef.get();
+          if (chatDoc.exists) {
+            await chatRef.update({
+              updatedAt: new Date().toISOString(),
+              messageCount: require('firebase-admin').firestore.FieldValue.increment(2),
+            });
+          } else {
+            // Recreate the chat doc if it was lost
+            const title = await generateChatTitle(message);
+            await chatRef.set({
+              chatId: currentChatId,
+              uid,
+              title,
+              createdAt: now,
+              updatedAt: new Date().toISOString(),
+              messageCount: 2,
+            });
+          }
         }
 
         // Log interaction

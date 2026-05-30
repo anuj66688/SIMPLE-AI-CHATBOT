@@ -4,7 +4,7 @@
  * Uses the Firebase ID token as a Bearer token.
  */
 
-const API_BASE_URL = "https://simple-ai-chatbot-sial.onrender.com/api";
+const API_BASE_URL = "https://simple-ai-chatbot-1-47cx.onrender.com/api";
 
 const ApiClient = {
   /**
