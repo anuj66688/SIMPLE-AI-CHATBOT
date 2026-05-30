@@ -9,7 +9,7 @@
 
 const firebaseConfig = {
   apiKey: "AIzaSyAlmBLXH5bSozajpqQnWkyg1uEVTeaFKzM",
-  authDomain: "simple-ai-chatbot-de606.firebaseapp.com",
+  authDomain: "simple-ai-chatbot1.vercel.app",
   projectId: "simple-ai-chatbot-de606",
   storageBucket: "simple-ai-chatbot-de606.firebasestorage.app",
   messagingSenderId: "25256077845",
